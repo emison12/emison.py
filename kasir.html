@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program Kasir Sederhana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        input[type="text"], input[type="number"], button {
+            padding: 10px;
+            margin: 5px;
+            width: calc(100% - 22px);
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .total {
+            text-align: right;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Program Kasir Sederhana</h1>
+
+    <!-- Form Input Barang -->
+    <label for="item-name">Nama Barang:</label>
+    <input type="text" id="item-name" placeholder="Nama barang">
+    
+    <label for="item-price">Harga Barang (Rp):</label>
+    <input type="number" id="item-price" placeholder="Harga barang" min="0">
+    
+    <label for="item-quantity">Jumlah Barang:</label>
+    <input type="number" id="item-quantity" placeholder="Jumlah barang" min="1">
+    
+    <button onclick="addItem()">Tambah Barang</button>
+    
+    <!-- Tabel Daftar Barang -->
+    <table id="cart">
+        <thead>
+            <tr>
+                <th>Nama Barang</th>
+                <th>Harga</th>
+                <th>Jumlah</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="total">
+        <p>Total: Rp <span id="total">0</span></p>
+        <label for="discount">Diskon (%):</label>
+        <input type="number" id="discount" placeholder="Diskon" min="0" max="100" onchange="applyDiscount()">
+        <p><strong>Total Setelah Diskon: Rp <span id="final-total">0</span></strong></p>
+    </div>
+</div>
+
+<script>
+    // Array untuk menyimpan data barang yang ditambahkan
+    let cart = [];
+
+    // Fungsi untuk menambahkan barang ke keranjang belanja
+    function addItem() {
+        // Ambil input dari form
+        const name = document.getElementById('item-name').value;
+        const price = parseFloat(document.getElementById('item-price').value);
+        const quantity = parseInt(document.getElementById('item-quantity').value);
+
+        // Validasi input
+        if (name === "" || isNaN(price) || isNaN(quantity) || price <= 0 || quantity <= 0) {
+            alert("Mohon masukkan data barang yang valid!");
+            return;
+        }
+
+        // Menambahkan barang ke array keranjang
+        const subtotal = price * quantity;
+        cart.push({ name, price, quantity, subtotal });
+
+        // Update tampilan daftar belanja
+        updateCart();
+        
+        // Kosongkan input form
+        document.getElementById('item-name').value = "";
+        document.getElementById('item-price').value = "";
+        document.getElementById('item-quantity').value = "";
+    }
+
+    // Fungsi untuk memperbarui tampilan tabel dan total harga
+    function updateCart() {
+        const cartTable = document.querySelector('#cart tbody');
+        cartTable.innerHTML = "";  // Kosongkan tabel sebelum menambah data baru
+        
+        let total = 0;
+        
+        // Loop untuk menampilkan barang yang ada di keranjang
+        cart.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>Rp ${item.price.toFixed(2)}</td>
+                <td>${item.quantity}</td>
+                <td>Rp ${item.subtotal.toFixed(2)}</td>
+            `;
+            cartTable.appendChild(row);
+            total += item.subtotal;
+        });
+        
+        // Update total harga
+        document.getElementById('total').textContent = total.toFixed(2);
+        document.getElementById('final-total').textContent = total.toFixed(2);
+    }
+
+    // Fungsi untuk menerapkan diskon
+    function applyDiscount() {
+        const discount = parseFloat(document.getElementById('discount').value);
+        const total = parseFloat(document.getElementById('total').textContent);
+        
+        // Validasi input diskon
+        if (isNaN(discount) || discount < 0 || discount > 100) {
+            alert("Diskon harus antara 0 dan 100%");
+            return;
+        }
+
+        // Hitung total setelah diskon
+        const discountAmount = total * (discount / 100);
+        const finalTotal = total - discountAmount;
+
+        // Update tampilan total setelah diskon
+        document.getElementById('final-total').textContent = finalTotal.toFixed(2);
+    }
+</script>
+
+</body>
+</html>
